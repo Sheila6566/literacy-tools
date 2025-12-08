@@ -1,4 +1,4 @@
-const { createApp, ref, onMounted, computed } = Vue;
+const { createApp, ref, onMounted, onUnmounted, computed } = Vue;
 
 const app = createApp({
 	setup() {
@@ -8,25 +8,62 @@ const app = createApp({
 		// 所有分类
 		const categories = window.categories;
 
+		// 已认识的汉字ID集合
+		const learnedCharacters = ref(new Set());
+
+		// 从localStorage加载已认识的汉字
+		const loadLearnedCharacters = () => {
+			const saved = localStorage.getItem("learnedCharacters");
+			if (saved) {
+				learnedCharacters.value = new Set(JSON.parse(saved));
+			}
+		};
+
+		// 保存已认识的汉字到localStorage
+		const saveLearnedCharacters = () => {
+			localStorage.setItem("learnedCharacters", JSON.stringify([...learnedCharacters.value]));
+		};
+
+		// 切换汉字的认识状态
+		const toggleLearned = (id) => {
+			if (learnedCharacters.value.has(id)) {
+				learnedCharacters.value.delete(id);
+			} else {
+				learnedCharacters.value.add(id);
+			}
+			saveLearnedCharacters();
+		};
+
+		// 检查汉字是否已认识
+		const isLearned = (id) => {
+			return learnedCharacters.value.has(id);
+		};
+
 		// 过滤后的汉字数据
 		const filteredCharacters = computed(() => {
+			let chars;
 			if (selectedCategory.value === "全部") {
-				return window.characterData;
+				chars = window.characterData;
+			} else if (selectedCategory.value === "已认识") {
+				chars = window.characterData.filter((char) => learnedCharacters.value.has(char.id));
+			} else if (selectedCategory.value === "未认识") {
+				chars = window.characterData.filter((char) => !learnedCharacters.value.has(char.id));
+			} else {
+				chars = window.characterData.filter((char) => char.category === selectedCategory.value);
 			}
-			return window.characterData.filter((char) => char.category === selectedCategory.value);
+
+			// 创建副本并打乱顺序
+			const shuffled = [...chars];
+			for (let i = shuffled.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+			}
+
+			return shuffled;
 		});
 
 		// 当前显示的汉字索引
 		const currentIndex = ref(0);
-
-		// 练习模式状态
-		const isInPracticeMode = ref(false);
-
-		// 用户答案
-		const userAnswer = ref("");
-
-		// 练习结果
-		const practiceResult = ref(null);
 
 		// 当前显示的汉字
 		const currentCharacter = computed(() => {
@@ -37,7 +74,7 @@ const app = createApp({
 		});
 
 		// 音频播放功能
-		const speakCharacter = (text) => {
+		const speakText = (text) => {
 			if ("speechSynthesis" in window) {
 				const utterance = new SpeechSynthesisUtterance(text);
 				utterance.lang = "zh-CN";
@@ -46,6 +83,16 @@ const app = createApp({
 			} else {
 				alert("您的浏览器不支持语音播放功能");
 			}
+		};
+
+		// 播放汉字发音
+		const speakCharacter = () => {
+			speakText(currentCharacter.value.char);
+		};
+
+		// 播放汉字意思
+		const speakMeaning = () => {
+			speakText(currentCharacter.value.meaning);
 		};
 
 		// 下一个汉字
@@ -66,57 +113,43 @@ const app = createApp({
 			}
 		};
 
-		// 开始练习模式
-		const startPractice = () => {
-			if (filteredCharacters.value.length === 0) {
-				alert("请选择一个包含汉字的分类");
-				return;
-			}
-			isInPracticeMode.value = true;
-			userAnswer.value = "";
-			practiceResult.value = null;
-			// 随机选择一个汉字进行练习
-			currentIndex.value = Math.floor(Math.random() * filteredCharacters.value.length);
-		};
-
-		// 结束练习模式
-		const endPractice = () => {
-			isInPracticeMode.value = false;
-			userAnswer.value = "";
-			practiceResult.value = null;
-		};
-
-		// 检查答案
-		const checkAnswer = () => {
-			if (filteredCharacters.value.length === 0) return;
-
-			const currentChar = filteredCharacters.value[currentIndex.value];
-			if (userAnswer.value.trim() === currentChar.char) {
-				practiceResult.value = "correct";
-				setTimeout(() => {
-					// 回到学习模式并显示下一个字符
-					endPractice();
-					nextCharacter();
-				}, 1500);
-			} else {
-				practiceResult.value = "incorrect";
-			}
-		};
-
-		// 键盘事件处理
-		const handleKeyPress = (event) => {
-			if (event.key === "Enter" && isInPracticeMode.value) {
-				checkAnswer();
-			}
-		};
-
 		// 当分类改变时重置索引
 		const onCategoryChange = () => {
 			currentIndex.value = 0;
 		};
 
+		// 键盘事件处理
+		const handleKeyPress = (event) => {
+			// 空格键播放发音
+			if (event.code === "Space") {
+				event.preventDefault();
+				speakCharacter();
+			}
+			// 向下箭头键播放意思
+			else if (event.code === "ArrowDown") {
+				event.preventDefault();
+				speakMeaning();
+			}
+			// 左箭头键显示上一个字符
+			else if (event.code === "ArrowLeft") {
+				event.preventDefault();
+				prevCharacter();
+			}
+			// 右箭头键显示下一个字符
+			else if (event.code === "ArrowRight") {
+				event.preventDefault();
+				nextCharacter();
+			}
+		};
+
+		// 生命周期钩子
 		onMounted(() => {
+			loadLearnedCharacters();
 			window.addEventListener("keydown", handleKeyPress);
+		});
+
+		onUnmounted(() => {
+			window.removeEventListener("keydown", handleKeyPress);
 		});
 
 		return {
@@ -124,17 +157,14 @@ const app = createApp({
 			selectedCategory,
 			filteredCharacters,
 			currentIndex,
-			isInPracticeMode,
-			userAnswer,
-			practiceResult,
 			currentCharacter,
 			speakCharacter,
+			speakMeaning,
 			nextCharacter,
 			prevCharacter,
-			startPractice,
-			endPractice,
-			checkAnswer,
 			onCategoryChange,
+			toggleLearned,
+			isLearned,
 		};
 	},
 
@@ -142,7 +172,7 @@ const app = createApp({
     <div class="literacy-app">
       <!-- 头部标题 -->
       <header class="app-header">
-        <h1>🌟 识字小工具 🌟</h1>
+        <h1>🌟 孙一然识字小工具 🌟</h1>
       </header>
       
       <!-- 分类选择 -->
@@ -155,6 +185,8 @@ const app = createApp({
           class="category-select"
         >
           <option value="全部">全部</option>
+		  <option value="已认识">已认识</option>
+		  <option value="未认识">未认识</option>
           <option v-for="category in categories" :key="category" :value="category">
             {{ category }}
           </option>
@@ -163,20 +195,33 @@ const app = createApp({
       
       <!-- 主要内容区域 -->
       <main class="app-main">
-        <div v-if="!isInPracticeMode" class="learning-mode">
+        <div class="learning-mode">
           <!-- 汉字展示卡片 -->
           <div class="character-card">
             <div class="character-display">
               {{ currentCharacter.char }}
+			  <div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
             </div>
             <div class="character-info">
               <div class="pinyin">拼音: {{ currentCharacter.pinyin }}</div>
               <div class="meaning">意思: {{ currentCharacter.meaning }}</div>
               <div class="category">类别: {{ currentCharacter.category }}</div>
             </div>
-            <button @click="speakCharacter(currentCharacter.char)" class="sound-btn">
-              🔊 听发音
-            </button>
+            <div class="sound-buttons">
+              <button @click="speakCharacter" class="sound-btn">
+                🔊 听发音
+              </button>
+              <button @click="speakMeaning" class="meaning-btn">
+                📖 听意思
+              </button>
+			  <button 
+			    v-if="currentCharacter.id" 
+				@click="toggleLearned(currentCharacter.id)" 
+				:class="['learn-btn', { learned: isLearned(currentCharacter.id) }]"
+			  >
+                {{ isLearned(currentCharacter.id) ? '✅ 取消认识' : '➕ 标记为认识' }}
+              </button>
+            </div>
           </div>
           
           <!-- 导航按钮 -->
@@ -185,43 +230,8 @@ const app = createApp({
             <span class="counter">{{ currentIndex + 1 }} / {{ filteredCharacters.length }}</span>
             <button @click="nextCharacter" class="nav-btn" :disabled="filteredCharacters.length <= 1">下一个 ➡️</button>
           </div>
-          
-          <!-- 开始练习按钮 -->
-          <div class="practice-section">
-            <button @click="startPractice" class="practice-btn" :disabled="filteredCharacters.length === 0">
-              🎮 开始练习
-            </button>
-          </div>
-        </div>
-        
-        <!-- 练习模式 -->
-        <div v-else class="practice-mode">
-          <div class="practice-card">
-            <h2>练习时间!</h2>
-            <div class="question">
-              <p>请问这是什么字？</p>
-              <div class="character-question">
-                {{ currentCharacter.char }}
-              </div>
-            </div>
-            
-            <div class="answer-section">
-              <input 
-                v-model="userAnswer" 
-                placeholder="请输入汉字..." 
-                class="answer-input"
-                @keyup.enter="checkAnswer"
-              />
-              <button @click="checkAnswer" class="submit-btn">提交答案</button>
-            </div>
-            
-            <div v-if="practiceResult" class="result" :class="practiceResult">
-              <div v-if="practiceResult === 'correct'">🎉 答对了！真棒！</div>
-              <div v-else>❌ 不对哦，再试试看</div>
-            </div>
-          </div>
-          
-          <button @click="endPractice" class="back-btn">🔙 返回学习</button>
+
+		  <div class="character-hint">空格键听发音，向下键听意思，左右键切换字</div>
         </div>
       </main>
       
@@ -232,7 +242,7 @@ const app = createApp({
             v-for="(char, index) in filteredCharacters" 
             :key="char.id"
             class="char-thumb"
-            :class="{ active: index === currentIndex }"
+            :class="{ active: index === currentIndex, learnedThumb: isLearned(char.id) }"
             @click="currentIndex = index"
           >
             {{ char.char }}
