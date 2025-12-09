@@ -172,7 +172,7 @@ const app = createApp({
     <div class="literacy-app">
       <!-- 头部标题 -->
       <header class="app-header">
-        <h1>🌟 孙一然识字小工具 🌟</h1>
+        <h1>🌟 Ethan识字小工具 🌟</h1>
       </header>
       
       <!-- 分类选择 -->
