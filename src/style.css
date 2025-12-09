@@ -22,7 +22,7 @@ body {
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	font-family: "Microsoft YaHei", Arial, sans-serif;
+	font-family: sans-serif, "Microsoft YaHei", Arial;
 }
 
 .app-header {
@@ -45,7 +45,7 @@ body {
 
 #category-select {
 	width: 150px;
-	padding: 3px;
+	padding: 5px;
 	border: none;
 	outline: none;
 }
@@ -63,6 +63,7 @@ body {
 	text-align: center;
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 	margin-bottom: 20px;
+	position: relative;
 }
 
 .character-display {
@@ -70,7 +71,6 @@ body {
 	color: #333;
 	font-weight: bold;
 	line-height: 1;
-	position: relative;
 }
 
 .character-hint {
@@ -106,7 +106,8 @@ body {
 .learn-btn {
 	color: white;
 	border: none;
-	padding: 10px 16px;
+	height: 40px;
+	width: 140px;
 	font-size: 1rem;
 	border-radius: 50px;
 	cursor: pointer;
@@ -167,7 +168,8 @@ body {
 	background: #2196f3;
 	color: white;
 	border: none;
-	padding: 10px 20px;
+	height: 40px;
+	width: 120px;
 	border-radius: 50px;
 	cursor: pointer;
 	font-size: 1rem;
@@ -231,7 +233,19 @@ body {
 }
 
 .learnedThumb {
-	border: 2px solid #4caf50;
+	/* outline: 1px solid #4caf50; */
+	background-color: rgba(76, 175, 79, 0.2);
+}
+
+.learnedThumb.active {
+	background-color: #4caf50;
+	color: #fff;
+}
+
+.characters-total {
+	text-align: center;
+	margin: 20px;
+	color: #999999;
 }
 
 /* 响应式设计 */

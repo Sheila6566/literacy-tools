@@ -199,9 +199,9 @@ const app = createApp({
           <!-- 汉字展示卡片 -->
           <div class="character-card">
             <div class="character-display">
-              {{ currentCharacter.char }}
-			  <div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
+              <p>{{ currentCharacter.char }}</p>
             </div>
+			<div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
             <div class="character-info">
               <div class="pinyin">拼音: {{ currentCharacter.pinyin }}</div>
               <div class="meaning">意思: {{ currentCharacter.meaning }}</div>
@@ -248,6 +248,8 @@ const app = createApp({
             {{ char.char }}
           </div>
         </div>
+
+		<p class="characters-total">共{{filteredCharacters.length}}个</p>
       </footer>
     </div>
   `,
