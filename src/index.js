@@ -199,7 +199,7 @@ const app = createApp({
           <!-- 汉字展示卡片 -->
           <div class="character-card">
             <div class="character-display">
-              <p>{{ currentCharacter.char }}</p>
+            	{{ currentCharacter.char }}
             </div>
 			<div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
             <div class="character-info">
