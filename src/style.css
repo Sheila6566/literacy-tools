@@ -94,7 +94,7 @@ button {
 
 .sound-buttons {
 	display: flex;
-	gap: 1rem;
+	gap: 2rem;
 	align-items: center;
 	justify-content: center;
 }
@@ -146,9 +146,9 @@ button {
 .nav-btn {
 	background: #27a051;
 	color: white;
-	height: 3.6rem;
+	height: 3.2rem;
 	line-height: 2em;
-	width: 11rem;
+	width: 12rem;
 	cursor: pointer;
 	transition: all 0.3s;
 }
@@ -168,16 +168,16 @@ button {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
-	gap: 1rem;
+	gap: 0.6;
 	overflow-y: auto;
 	padding: 0.5rem;
 	min-height: 8em;
 }
 
 .char-thumb {
-	width: 3.5rem;
-	height: 3.5rem;
-	line-height: 4rem;
+	width: 3.2rem;
+	height: 3.2rem;
+	line-height: 3.2rem;
 	background: white;
 	border-radius: 0.5rem;
 	text-align: center;
