@@ -171,87 +171,79 @@ const app = createApp({
 	template: `
     <div class="literacy-app">
       <!-- 头部标题 -->
-      <header class="app-header">
+      <!-- <header class="app-header">
         <h1>🌟 Ethan识字小工具 🌟</h1>
-      </header>
+      </header> -->
       
       <!-- 分类选择 -->
-      <div class="category-selector">
-        <label for="category-select">选择学习类别：</label>
-        <select 
-          id="category-select" 
-          v-model="selectedCategory" 
-          @change="onCategoryChange"
-          class="category-select"
-        >
-          <option value="全部">全部</option>
-		  <option value="已认识">已认识</option>
-		  <option value="未认识">未认识</option>
-          <option v-for="category in categories" :key="category" :value="category">
-            {{ category }}
-          </option>
-        </select>
-      </div>
+		<div class="category-selector">
+			<label for="category-select">选择学习类别：</label>
+			<select 
+				id="category-select" 
+				v-model="selectedCategory" 
+				@change="onCategoryChange"
+				class="category-select"
+			>
+				<option value="全部">全部</option>
+				<option value="已认识">已认识</option>
+				<option value="未认识">未认识</option>
+				<option v-for="category in categories" :key="category" :value="category">
+				{{ category }}
+				</option>
+			</select>
+		</div>
       
-      <!-- 主要内容区域 -->
-      <main class="app-main">
-        <div class="learning-mode">
-          <!-- 汉字展示卡片 -->
-          <div class="character-card">
-            <div class="character-display">
-              <p>{{ currentCharacter.char }}</p>
-            </div>
-			<div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
-            <div class="character-info">
-              <div class="pinyin">拼音: {{ currentCharacter.pinyin }}</div>
-              <div class="meaning">意思: {{ currentCharacter.meaning }}</div>
-              <div class="category">类别: {{ currentCharacter.category }}</div>
-            </div>
-            <div class="sound-buttons">
-              <button @click="speakCharacter" class="sound-btn">
-                🔊 听发音
-              </button>
-              <button @click="speakMeaning" class="meaning-btn">
-                📖 听意思
-              </button>
-			  <button 
-			    v-if="currentCharacter.id" 
-				@click="toggleLearned(currentCharacter.id)" 
-				:class="['learn-btn', { learned: isLearned(currentCharacter.id) }]"
-			  >
-                {{ isLearned(currentCharacter.id) ? '✅ 取消认识' : '➕ 标记为认识' }}
-              </button>
-            </div>
-          </div>
-          
-          <!-- 导航按钮 -->
-          <div class="navigation">
-            <button @click="prevCharacter" class="nav-btn" :disabled="filteredCharacters.length <= 1">⬅️ 上一个</button>
-            <span class="counter">{{ currentIndex + 1 }} / {{ filteredCharacters.length }}</span>
-            <button @click="nextCharacter" class="nav-btn" :disabled="filteredCharacters.length <= 1">下一个 ➡️</button>
-          </div>
+      	<!-- 主要内容区域 -->
+		<main class="app-main">
+			<div class="learning-mode">
+			<!-- 汉字展示卡片 -->
+			<div class="character-card">
+				<div class="character-display">
+					{{ currentCharacter.char }}
+				</div>
+				<div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
+				<div class="character-info">
+				<div class="pinyin">📖拼音: {{ currentCharacter.pinyin }}</div>
+				<div class="meaning" @click="speakMeaning">💡 意思: {{ currentCharacter.meaning }}</div>
+				<!-- <div class="category">📚 分类: {{ currentCharacter.category }}</div> -->
+				</div>
+				<div class="sound-buttons">
+				
+				<button 
+					v-if="currentCharacter.id" 
+					@click="toggleLearned(currentCharacter.id)" 
+					:class="['learn-btn', { learned: isLearned(currentCharacter.id) }]"
+				>
+					{{ isLearned(currentCharacter.id) ? '✅ 取消认识' : '✅ 标记为认识' }}
+				</button>
 
-		  <div class="character-hint">空格键听发音，向下键听意思，左右键切换字</div>
-        </div>
-      </main>
+				<button @click="speakCharacter" class="sound-btn">🔊 听发音</button>
+				</div>
+			</div>
+			</div>
+		</main>
       
-      <!-- 字符列表缩略图 -->
-      <footer class="app-footer">
-        <div class="characters-preview">
-          <div 
-            v-for="(char, index) in filteredCharacters" 
-            :key="char.id"
-            class="char-thumb"
-            :class="{ active: index === currentIndex, learnedThumb: isLearned(char.id) }"
-            @click="currentIndex = index"
-          >
-            {{ char.char }}
-          </div>
-        </div>
+      	<!-- 字符列表缩略图 -->
+		<div class="characters-preview">
+			<div 
+				v-for="(char, index) in filteredCharacters" 
+				:key="char.id"
+				class="char-thumb"
+				:class="{ active: index === currentIndex, learnedThumb: isLearned(char.id) }"
+				@click="currentIndex = index"
+			>
+				{{ char.char }}
+			</div>
+		</div>
 
-		<p class="characters-total">共{{filteredCharacters.length}}个</p>
-      </footer>
-    </div>
+	  	<!-- 导航按钮 -->
+		<footer class="navigation">
+			<button @click="prevCharacter" class="nav-btn" :disabled="filteredCharacters.length <= 1">⬅️ 上一个</button>
+			<span class="counter">{{ currentIndex + 1 }} / {{ filteredCharacters.length }}</span>
+			<button @click="nextCharacter" class="nav-btn" :disabled="filteredCharacters.length <= 1">下一个 ➡️</button>
+		
+		</footer>
+	</div>
   `,
 });
 
