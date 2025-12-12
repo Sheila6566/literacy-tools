@@ -173,12 +173,8 @@ const app = createApp({
       <!-- 头部标题 -->
       <header class="app-header">
         <h1>🌟 Ethan识字小工具 🌟</h1>
-      </header>
-      
-      <!-- 分类选择 -->
-      <div class="category-selector">
-        <label for="category-select">选择学习类别：</label>
-        <select 
+
+		<select 
           id="category-select" 
           v-model="selectedCategory" 
           @change="onCategoryChange"
@@ -191,7 +187,7 @@ const app = createApp({
             {{ category }}
           </option>
         </select>
-      </div>
+      </header>
       
       <!-- 主要内容区域 -->
       <main class="app-main">
@@ -199,7 +195,7 @@ const app = createApp({
           <!-- 汉字展示卡片 -->
           <div class="character-card">
             <div class="character-display">
-              <p>{{ currentCharacter.char }}</p>
+              {{ currentCharacter.char }}
             </div>
 			<div v-if="currentCharacter.id && isLearned(currentCharacter.id)" class="learned-mark">✓</div>
             <div class="character-info">
@@ -208,18 +204,20 @@ const app = createApp({
               <div class="category">类别: {{ currentCharacter.category }}</div>
             </div>
             <div class="sound-buttons">
-              <button @click="speakCharacter" class="sound-btn">
-                🔊 听发音
-              </button>
-              <button @click="speakMeaning" class="meaning-btn">
-                📖 听意思
-              </button>
 			  <button 
 			    v-if="currentCharacter.id" 
 				@click="toggleLearned(currentCharacter.id)" 
 				:class="['learn-btn', { learned: isLearned(currentCharacter.id) }]"
 			  >
                 {{ isLearned(currentCharacter.id) ? '✅ 取消认识' : '➕ 标记为认识' }}
+              </button>
+
+			  <button @click="speakMeaning" class="meaning-btn">
+                📖 听意思
+              </button>
+
+			  <button @click="speakCharacter" class="sound-btn">
+                🔊 听发音
               </button>
             </div>
           </div>
@@ -230,8 +228,6 @@ const app = createApp({
             <span class="counter">{{ currentIndex + 1 }} / {{ filteredCharacters.length }}</span>
             <button @click="nextCharacter" class="nav-btn" :disabled="filteredCharacters.length <= 1">下一个 ➡️</button>
           </div>
-
-		  <div class="character-hint">空格键听发音，向下键听意思，左右键切换字</div>
         </div>
       </main>
       
@@ -248,8 +244,6 @@ const app = createApp({
             {{ char.char }}
           </div>
         </div>
-
-		<p class="characters-total">共{{filteredCharacters.length}}个</p>
       </footer>
     </div>
   `,
