@@ -106,12 +106,12 @@ button {
 	cursor: pointer;
 	transition: all 0.3s;
 	line-height: 2.2em;
+	width: 9em;
 }
 
 .sound-btn:hover,
 .learn-btn:hover {
 	transform: scale(1.05);
-	width: 9em;
 }
 
 .sound-btn {
@@ -177,7 +177,7 @@ button {
 	height: 2.5rem;
 	line-height: 2.5rem;
 	background: white;
-	border-radius: 0.5rem;
+	border-radius: 0.2rem;
 	text-align: center;
 	font-size: 1.5rem;
 	cursor: pointer;
